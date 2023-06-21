@@ -1,4 +1,5 @@
 import * as React from "react"
+import Seo from "../../components/seo"
 
 const EventsPage = () => {
   return (
@@ -10,4 +11,4 @@ const EventsPage = () => {
 
 export default EventsPage
 
-export const Head = () => <title>Events</title>
+export const Head = () => <Seo title="Events"/>

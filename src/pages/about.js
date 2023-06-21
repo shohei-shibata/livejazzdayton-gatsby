@@ -1,4 +1,5 @@
 import * as React from "react"
+import Seo from "../components/seo"
 
 const AboutPage = () => {
   return (
@@ -10,4 +11,4 @@ const AboutPage = () => {
 
 export default AboutPage
 
-export const Head = () => <title>About</title>
+export const Head = () => <Seo title="About"/>

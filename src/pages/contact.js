@@ -1,4 +1,5 @@
 import * as React from "react"
+import Seo from "../components/seo"
 
 const ContactPage = () => {
   return (
@@ -10,4 +11,4 @@ const ContactPage = () => {
 
 export default ContactPage
 
-export const Head = () => <title>Contact</title>
+export const Head = () => <Seo title="Contact"/>
