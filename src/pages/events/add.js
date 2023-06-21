@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import Seo from "../../components/seo"
 import ICAL from "ical.js"
 import slugify from "../../utils/slugify"
+import EventDetails from "../../components/event-details"
 
 /* Event SCHEMA 
 
@@ -139,11 +140,18 @@ const AddEventPage = () => {
       <h2>Event Preview</h2>
       {eventData ? 
         <>
-          <p>Title: {eventData.title}</p>
-          <p>Start: {eventData.start.toLocaleString()}</p>
-          <p>End: {eventData.end.toLocaleString()}</p>
-          <p>Location: {eventData.location.name}</p>
-          <p>Description: {eventData.description}</p>
+          <EventDetails
+            imageUrl = {eventData.imageUrl}
+            title = {eventData.title}
+            slug = {eventData.slug}
+            artists = {eventData.artists}
+            links = {eventData.links}
+            description = {eventData.description}
+            start = {eventData.start}
+            end = {eventData.end}
+            location= {eventData.location}
+          />
+
           <h2>Submit Event</h2>
           <p>Everything looks good? Click below to submit the event.</p>
           <p>NOTE: Event will appear on the website after an admin has reviewed and approved it.</p>
