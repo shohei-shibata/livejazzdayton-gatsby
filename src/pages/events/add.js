@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import Seo from "../../components/seo"
 import ICAL from "ical.js"
+import slugify from "../../utils/slugify"
 
 /* Event SCHEMA 
 
@@ -58,38 +59,68 @@ const eventFormatted = {
 */
 
 const AddEventPage = () => {
-  const [IcalData, setIcalData] = useState()
+  const [icalData, setIcalData] = useState()
+  const [eventData, setEventData] = useState()
   const [isFilePicked, setIsFilePicked] = useState(false)
-  const reader = new FileReader()
   const handleFileUpload = async e => {
     const file = e.target.files[0]
     const dataText = await file.text()
     const jcal = ICAL.parse(dataText)
     const comp = new ICAL.Component(jcal)
-    console.log("COMP", comp)
     const vevent = comp.getFirstSubcomponent("vevent")
-    console.log("VEVENT", vevent)
-    const summary = vevent.getFirstPropertyValue("summary");
-    console.log("Summary", summary)
     const eventData = new ICAL.Event(vevent)
-    console.log("Event data", eventData.summary)
+
     setIcalData({
       title: eventData.summary,
-      startDateTime: eventData.startDate,
-      endDateTime: eventData.endDate,
+      start: eventData.startDate,
+      end: eventData.endDate,
       location: eventData.location,
       description: eventData.description
     })
-    //setIsFilePicked(true)
+    setIsFilePicked(true)
+    setEventData(parseIcalData({
+      title: eventData.summary,
+      start: eventData.startDate,
+      end: eventData.endDate,
+      location: eventData.location,
+      description: eventData.description
+    }))
+  }
+  const parseIcalData = (data) => {
+    const start = new Date(Date.UTC(
+      data.start._time.year, 
+      data.start._time.month-1, 
+      data.start._time.day, 
+      data.start._time.hour, 
+      data.start._time.minute
+    ))
+    const end = new Date(Date.UTC(
+      data.end._time.year, 
+      data.end._time.month-1, 
+      data.end._time.day, 
+      data.end._time.hour, 
+      data.end._time.minute
+    ))
+    const slug = slugify(`${start.toDateString()} ${data.title}`)
+    return {
+      slug: slug,
+      title: data.title,
+      start: start, 
+      end: end,
+      location: {
+          name: data.location,
+      },
+      description: data.description
+    }
   }
   const handleSubmit = e => {
-    alert("Submit", IcalData)
+    alert("Submit", icalData)
   }
   const resetFileUpload = () => {
     setIcalData(null)
     setIsFilePicked(false)
   }
-  console.log("data", IcalData)
+  console.log("eventData", eventData)
   return (
     <>
       <h1>Add an Event</h1>
@@ -106,9 +137,14 @@ const AddEventPage = () => {
         </form>
       }
       <h2>Event Preview</h2>
-      {IcalData ? 
+      {eventData ? 
         <>
-          <p>Show iCal Data</p>
+          <p>Title: {eventData.title}</p>
+          <p>Start: {eventData.start.toLocaleString()}</p>
+          <p>End: {eventData.end.toLocaleString()}</p>
+          <p>Location: {eventData.location.name}</p>
+          <p>Description: {eventData.description}</p>
+          <h2>Submit Event</h2>
           <p>Everything looks good? Click below to submit the event.</p>
           <p>NOTE: Event will appear on the website after an admin has reviewed and approved it.</p>
           <button onClick={handleSubmit}>Submit Event</button>

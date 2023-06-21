@@ -27,7 +27,9 @@ const SignUp = () => (
     action="https://buttondown.email/api/emails/embed-subscribe/livejazzdayton"
     method="post"
     target="popupwindow"
-    onSubmit="window.open('https://buttondown.email/livejazzdayton', 'popupwindow')"
+    onSubmit={() => {
+      window.open('https://buttondown.email/livejazzdayton', 'popupwindow')
+    }}
     className="newsletter-signup-form"
   >
     <div className="input-group">
