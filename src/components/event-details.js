@@ -1,8 +1,9 @@
 import React from "react"
-import { StaticImage } from "gatsby-plugin-image"
 import getGoogleQueryString from "../utils/googleQueryString"
 
-const EventDetails = ({imageUrl, title, slug, artists, links, description, start, end, location}) => {
+const EventDetails = ({eventData}) => {
+  console.log("Event Details", eventData)
+  const {imageUrl, title, slug, artists, links, description, start, end, location} = eventData
   const GOOGLE_API_KEY = process.env.GATSBY_GOOGLE_API_KEY
   const eventDateString = start.toLocaleDateString("en-US", {timeZone: "America/New_York"})
   const today = new Date()
@@ -14,13 +15,14 @@ const EventDetails = ({imageUrl, title, slug, artists, links, description, start
   const googleMapsUrl = `https://maps.google.com/maps?q=${getGoogleQueryString(`${location.name} ${location.address || "near Dayton, Ohio"}`)}`
   const googleMapsEmbedUrl = `https://www.google.com/maps/embed/v1/search?q=${getGoogleQueryString(`${location.name} ${location.address || "near Dayton, Ohio"}`)}&key=${GOOGLE_API_KEY}`
 
-  console.log("query string", getGoogleQueryString(`${location.name} ${location.address || "near Dayton, Ohio"}`), googleMapsEmbedUrl, googleMapsUrl)
   return (
     <section id="event-details">
-      {imageUrl ? 
-        <div id="event-featured-image">
-          <StaticImage src={ imageUrl } alt="Featured image for the event"/>
-        </div> : null }
+    <div id="event-featured-image">
+        {imageUrl ? 
+          <img src={ imageUrl } alt="Featured image for the event"/>
+          : null 
+        }
+      </div>
 
       <h1>{ title } 
         <button 

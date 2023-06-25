@@ -3,6 +3,7 @@ import Seo from "../../components/seo"
 import ICAL from "ical.js"
 import slugify from "../../utils/slugify"
 import EventDetails from "../../components/event-details"
+import EventEditForm from "../../components/event-edit"
 
 /* Event SCHEMA 
 
@@ -63,6 +64,7 @@ const AddEventPage = () => {
   const [icalData, setIcalData] = useState()
   const [eventData, setEventData] = useState()
   const [isFilePicked, setIsFilePicked] = useState(false)
+
   const handleFileUpload = async e => {
     const file = e.target.files[0]
     const dataText = await file.text()
@@ -114,18 +116,20 @@ const AddEventPage = () => {
       description: data.description
     }
   }
-  const handleSubmit = e => {
-    alert("Submit", icalData)
+  const handleIcalSubmit = e => {
+    alert("Submit Ical Submit", icalData)
   }
   const resetFileUpload = () => {
     setIcalData(null)
     setIsFilePicked(false)
   }
-  console.log("eventData", eventData)
+  const handleEventSubmit = e => {
+    alert("Event Submit", eventData)
+  }
   return (
     <>
       <h1>Add an Event</h1>
-      <h2>Upload an iCal file</h2>
+      <h2 id="upload">1. Upload an iCal file</h2>
       {isFilePicked ? 
         <>
           <p>File has been selected. See the preview below, and click "Submit Event" if everything looks OK.</p>
@@ -134,13 +138,15 @@ const AddEventPage = () => {
         :
         <form>
           <input type="file" name="ical" onChange={handleFileUpload}/>
-          <input type="submit" value="Upload" onSubmit={handleSubmit}/>
         </form>
       }
-      <h2>Event Preview</h2>
-      {eventData ? 
+      {eventData ?
         <>
+          <h2 id="edit">2. Edit Event Details</h2>
+          <EventEditForm eventData={eventData} setEventData={setEventData}/>
+          <h2 id="preview">3. Preview Event Content</h2>
           <EventDetails
+            eventData = {eventData}
             imageUrl = {eventData.imageUrl}
             title = {eventData.title}
             slug = {eventData.slug}
@@ -151,14 +157,13 @@ const AddEventPage = () => {
             end = {eventData.end}
             location= {eventData.location}
           />
-
-          <h2>Submit Event</h2>
+          
+          <h2 id="submit">Submit Event</h2>
           <p>Everything looks good? Click below to submit the event.</p>
           <p>NOTE: Event will appear on the website after an admin has reviewed and approved it.</p>
-          <button onClick={handleSubmit}>Submit Event</button>
+          <button onClick={handleEventSubmit}>Submit Event</button>
         </>
-        :
-        <p>No calendar data has been selected. Please use the form above to upload an iCal file.</p>
+        : null
       }
     </>
   )
