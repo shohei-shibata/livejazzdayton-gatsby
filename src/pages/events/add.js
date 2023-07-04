@@ -4,6 +4,8 @@ import ICAL from "ical.js"
 import slugify from "../../utils/slugify"
 import EventDetails from "../../components/event-details"
 import EventEditForm from "../../components/event-edit"
+import htmlToMd from "../../utils/html-to-md"
+import mdToHtml from "../../utils/md-to-html"
 
 /* Event SCHEMA 
 
@@ -73,20 +75,22 @@ const AddEventPage = () => {
     const vevent = comp.getFirstSubcomponent("vevent")
     const eventData = new ICAL.Event(vevent)
 
+    const descriptionInHtml = await mdToHtml(eventData.description)
+
     setIcalData({
       title: eventData.summary,
       start: eventData.startDate,
       end: eventData.endDate,
-      location: eventData.location,
-      description: eventData.description
+      locationName: eventData.location,
+      description: descriptionInHtml
     })
     setIsFilePicked(true)
     setEventData(parseIcalData({
       title: eventData.summary,
       start: eventData.startDate,
       end: eventData.endDate,
-      location: eventData.location,
-      description: eventData.description
+      locationName: eventData.location,
+      description: descriptionInHtml
     }))
   }
   const parseIcalData = (data) => {
@@ -110,9 +114,7 @@ const AddEventPage = () => {
       title: data.title,
       start: start, 
       end: end,
-      location: {
-          name: data.location,
-      },
+      locationName: data.locationName,
       description: data.description
     }
   }
@@ -155,7 +157,7 @@ const AddEventPage = () => {
             description = {eventData.description}
             start = {eventData.start}
             end = {eventData.end}
-            location= {eventData.location}
+            locationName= {eventData.locationName}
           />
           
           <h2 id="submit">Submit Event</h2>
