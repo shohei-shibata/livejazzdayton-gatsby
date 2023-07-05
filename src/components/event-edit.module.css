@@ -1,0 +1,36 @@
+.event-edit-form label {
+  margin: 10px 0;
+}
+.date-time-form-date,
+.date-time-form-time {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  max-width: 500px;
+  margin: auto;
+}
+.date-time-form-date select,
+.date-time-form-date input,
+.date-time-form-time select,
+.date-time-form-time input,
+.duration input,
+.duration select {
+  border: none;
+  background-color: #fff;
+  text-align: center;
+  padding: 10px 5px;
+  appearance: none;
+  box-sizing: border-box;
+}
+
+.date-time-form-date input,
+.date-time-form-time input,
+.duration input {
+  -moz-appearance: textfield;
+}
+.duration {
+  display: grid;
+  grid-template-columns: 50px 20px 50px;
+  max-width: 120px;
+  align-items: center;
+  margin: auto;
+}

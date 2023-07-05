@@ -53,15 +53,20 @@ const EventDetails = ({eventData}) => {
       </p>
 
       <div className="tags-container">
-        {artists?.map(artist => (
-          <span className="tag">{ artist === "" ? "Unknown Artist" : artist }</span>
+        {artists?.map((artist, index) => (
+          <span key={`${artist}-${index}`} className="tag">{ artist === "" ? "Unknown Artist" : artist }</span>
         ))}
       </div>
 
       <div id="event-links-container">
         {/* Need to add calendar link */}
         {links?.map(link => (
-          <a className="btn-secondary" href={link.url} style={!link.url ? {pointerEvents: "none", display: "none"} : {}}>
+          <a 
+            key={`${link.name}-link`}
+            className="btn-secondary" 
+            href={link.url} 
+            style={!link.url ? {pointerEvents: "none", display: "none"} : {}}
+          >
             {link.name}
           </a>
         ))}
@@ -71,7 +76,7 @@ const EventDetails = ({eventData}) => {
 
       <div className="google-maps-container">
         <div className="google-maps-canvas">
-          <iframe frameborder="0" src={googleMapsEmbedUrl} title="Google Maps Embed"/>
+          <iframe src={googleMapsEmbedUrl} title="Google Maps Embed"/>
         </div>
       </div>
 
