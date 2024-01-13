@@ -27,8 +27,6 @@ const DateTimeForm = ({dateTime, setDateTime, name}) => {
     const isPm = field === "am-pm" && value === "PM" ? true : false
 
     const newDateTime = new Date(year, month, date, isPm ? hours + 12 : hours, minutes)
-
-    console.log("newDateTime", newDateTime)
     
     if (newDateTime instanceof Date && !isNaN(newDateTime.valueOf())) {
       setDateTime(newDateTime)
@@ -38,6 +36,15 @@ const DateTimeForm = ({dateTime, setDateTime, name}) => {
     const now = new Date()
     return now.getFullYear()
   }
+  const getDatesArray = () => {
+    const month = dateTime.getMonth()
+    const year = dateTime.getFullYear()
+    const numDays = new Date(year, month + 1, 0).getDate()
+    return [...Array(numDays+1).keys()].slice(1)
+  }
+
+  const datesArray = getDatesArray()
+  
   return (
     <div className={eventEditStyle.dateTimeForm}>
       <div className={eventEditStyle.dateTimeFormDate}>
@@ -59,26 +66,49 @@ const DateTimeForm = ({dateTime, setDateTime, name}) => {
           <option value="10">November</option>
           <option value="11">December</option>
         </select>
-        <input 
+        <select
           type="number" 
           name={`${name}-date`}
           value={formData ? formData.date : 1} 
           onChange={e => updateDateTime("date", e.target.value)}
-        />
-        <input 
+        >
+          {datesArray.map(d => (
+            <option key={`date-${d}`} value={d}>{d}</option>
+          ))}
+        </select> 
+        ,
+        <select 
           type="number" 
           name={`${name}-year`} 
           value={formData ? formData.year : currentYear()} 
           onChange={e => updateDateTime("year", e.target.value)}
-        />
+        >
+          <option value={currentYear()}>{currentYear()}</option>
+          <option value={currentYear()+1}>{currentYear()+1}</option>
+          <option value={currentYear()+2}>{currentYear()+2}</option>
+        </select>
       </div>
       <div className={eventEditStyle.dateTimeFormTime}>
-        <input
+        <select
           type="number"
           name={`${name}-hour`}
           value={formData ? formData.hours : 7}
           onChange={e => updateDateTime("hours", e.target.value)}
-        />
+        >
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+          <option value="11">11</option>
+          <option value="12">12</option>
+        </select>
+        :
         <select
           name={`${name}-minutes`}
           value={formData ? formData.minutes : 0}
@@ -107,6 +137,7 @@ const EventEditForm = ({eventData, setEventData, incrementStep}) => {
   const [ startDateTime, setStartDateTime ] = useState(eventData.start)
   const [ endDateTime, setEndDateTime ] = useState(eventData.end)
   const [ descriptionInMd, setDescriptionInMd ] = useState()
+  const [ error, setError ] = useState({messages: []})
 
   useEffect(() => {
     async function descriptionToMd() {
@@ -120,44 +151,56 @@ const EventEditForm = ({eventData, setEventData, incrementStep}) => {
     imageUrl: useRef(eventData.imageUrl),
     title: useRef(eventData.title),
     locationName: useRef(eventData.locationName),
+    locationAddress: useRef(eventData.locationAddress),
     artists: useRef(eventData.artists?.join(",")),
     description: useRef(eventData.description),
-    eventUrl: useRef(eventData.eventUrl),
+    websiteUrl: useRef(eventData.websiteUrl),
     ticketUrl: useRef(eventData.ticketUrl),
     start: useRef(eventData.start),
     end: useRef(eventData.end),
-    durationHours: useRef(Math.floor((endDateTime - startDateTime)/1000/60/60)),
-    durationMinutes: useRef(((endDateTime - startDateTime)/1000/60) % 60)
   }
-  const handleStartDateTimeChange = (newDateTime) => {
-    setStartDateTime(newDateTime)
-    handleDurationChange(newDateTime)
-  }
-  const handleDurationChange = (currentStartDateTime) => {
-    const durationInMinutes = parseInt(formRef.durationHours.current.value*60) + parseInt(formRef.durationMinutes.current.value)
-    const dt = new Date(currentStartDateTime)
-    setEndDateTime(new Date(dt.setMinutes(currentStartDateTime.getMinutes() + durationInMinutes)))
-  }
-
-  console.log("end", endDateTime)
   const handleSubmit = async e => {
     e.preventDefault()
+    if (startDateTime > endDateTime) {
+      setError({
+        messages: ["Event end cannot be earlier than event start."]
+      })
+      setTimeout(() => {
+        window.scrollTo({
+          top: 300,
+          behavior: 'smooth',
+        })
+      }, 100)
+      return
+    }
     const descriptionInHtml = await mdToHtml(formRef.description.current.value)
     setEventData({
+      ...eventData,
       imageUrl: formRef.imageUrl.current.value,
       title: formRef.title.current.value,
       locationName: formRef.locationName.current.value,
+      locationAddress: formRef.locationAddress.current.value,
       artists: formRef.artists.current.value.split(',').map(artist => artist.trim()),
       description: descriptionInHtml,
-      eventUrl: formRef.eventUrl.current.value,
-      ticketUrl: formRef.ticketUrl.current.value,
       start: new Date(formRef.start.current.value),
-      end: new Date(formRef.end.current.value)
+      end: new Date(formRef.end.current.value),
+      websiteUrl: formRef.websiteUrl.current.value,
+      ticketUrl: formRef.ticketUrl.current.value,
     })
     incrementStep()
   }
   return (
     <form onSubmit={handleSubmit} className={eventEditStyle.eventEditForm}>
+      { error.messages.length > 0 && 
+        <div className={eventEditStyle.error}>
+          Error: 
+          <ul className={eventEditStyle.errorMessagesList}>
+            { error.messages?.map((message, index) => (
+            <span >{message}</span>))
+            }
+          </ul>
+        </div>
+      }
       <label htmlFor="imageUrl">
         Featured Image Link:
         <input type="url" name="imageUrl" ref={formRef.imageUrl} defaultValue={eventData.imageUrl}/>
@@ -166,9 +209,13 @@ const EventEditForm = ({eventData, setEventData, incrementStep}) => {
         Event Name:
         <input type="text" name="title" ref={formRef.title} defaultValue={eventData.title}/>
       </label>
-      <label htmlFor="location">
-        Location:
+      <label htmlFor="locationName">
+        Location Name:
         <input type="text" name="locationName" ref={formRef.locationName} defaultValue={eventData.locationName}/>
+      </label>
+      <label htmlFor="locationAddress">
+        Location Address:
+        <input type="text" name="locationAddress" ref={formRef.locationAddress} defaultValue={eventData.locationAddress}/>
       </label>
       <label htmlFor="artists">
         Artists (separate names with commas):
@@ -192,50 +239,29 @@ const EventEditForm = ({eventData, setEventData, incrementStep}) => {
       />
       <DateTimeForm
         dateTime={startDateTime}
-        setDateTime={handleStartDateTimeChange}
+        setDateTime={setStartDateTime}
         name="start"
       />
-      <h3>Duration</h3>
-      <div className={eventEditStyle.duration}>
-        <input
-          htmlFor="durationHours"
-          name="durationHours"
-          type="number"
-          defaultValue={Math.floor((endDateTime - startDateTime)/1000/60/60)}
-          onChange={e => handleDurationChange(startDateTime)}
-          ref={formRef.durationHours}
-        />
-        <span>:</span>
-        <select
-          htmlFor="durationMinutes"
-          name="durationMinutes"
-          type="number"
-          defaultValue={((endDateTime - startDateTime)/1000/60) % 60}
-          onChange={e => handleDurationChange(startDateTime)}
-          ref={formRef.durationMinutes}
-        >
-          <option value="0">00</option>
-          <option value="10">10</option>
-          <option value="20">20</option>
-          <option value="30">30</option>
-          <option value="40">40</option>
-          <option value="50">50</option>
-        </select>
-      </div>
+      <h3>Event End</h3>
       <input 
-        htmlFor="start" 
+        htmlFor="end" 
         type="hidden" 
         value={endDateTime}
         ref={formRef.end}
       />
-      <h3>Event Links</h3>
-      <label htmlFor="eventUrl">
+      <DateTimeForm
+        dateTime={endDateTime}
+        setDateTime={setEndDateTime}
+        name="end"
+      />
+      <h3>Web Links</h3>
+      <label htmlFor="websiteUrl">
         Event Website:
         <input 
           type="url" 
-          name="eventUrl"
-          defaultValue={eventData.eventUrl}
-          ref={formRef.eventUrl}
+          name="websiteUrl"
+          defaultValue={eventData.websiteUrl}
+          ref={formRef.websiteUrl}
         />
       </label>
       <label htmlFor="ticketUrl">

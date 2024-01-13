@@ -11,6 +11,8 @@
 	--color-btn: #dd3436;
 	--color-banner: #111;
 	--color-background-footer: #333;
+  --color-warning: #dd3436;
+  --color-warning-bg: #fdf5f5;
 	--image-width-normal: 800px;
 	--main-content-width: 800px;
 }

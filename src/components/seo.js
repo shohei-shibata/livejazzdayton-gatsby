@@ -12,8 +12,7 @@ const Seo = ({title}) => {
     <link href="https://fonts.googleapis.com/css2?family=Barlow&family=Rubik+Dirt&display=swap" rel="stylesheet"/>
     <script src="https://kit.fontawesome.com/d2a533daa7.js" crossOrigin="anonymous"/>
     <script src="https://code.iconify.design/iconify-icon/1.0.0/iconify-icon.min.js"/>
-    <script src="/assets/clipboard.min.js"/>
-    <script src="/assets/clip.js"/>
+    <script src="/clipboard.min.js"/>
   </>
 )}
 

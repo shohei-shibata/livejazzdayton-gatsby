@@ -5,6 +5,7 @@ import slugify from "../../utils/slugify"
 import EventDetails from "../../components/event-details"
 import EventEditForm from "../../components/event-edit"
 import mdToHtml from "../../utils/md-to-html"
+import axios from "axios"
 
 /* Event SCHEMA 
 
@@ -64,6 +65,7 @@ const eventFormatted = {
 const AddEventPage = () => {
   const [eventData, setEventData] = useState()
   const [step, setStep] = useState(1)
+  const [submitError, setSubmitError] = useState()
 
   const handleFileUpload = async e => {
     const file = e.target.files[0]
@@ -71,19 +73,19 @@ const AddEventPage = () => {
     const jcal = ICAL.parse(dataText)
     const comp = new ICAL.Component(jcal)
     const vevent = comp.getFirstSubcomponent("vevent")
-    const eventData = new ICAL.Event(vevent)
-    const descriptionInHtml = await mdToHtml(eventData.description)
+    const data = new ICAL.Event(vevent)
+    const descriptionInHtml = await mdToHtml(data.description)
     setEventData(parseIcalData({
-      title: eventData.summary,
-      start: eventData.startDate,
-      end: eventData.endDate,
-      locationName: eventData.location,
+      title: data.summary,
+      slug: data.slug,
+      start: data.startDate,
+      end: data.endDate,
+      locationAddress: data.location,
       description: descriptionInHtml
     }))
     nextStep()
   }
   const scrollToTop = () => {
-    console.log("Scroll To Top")
     setTimeout(() => {
         window.scrollTo({
         top: 0,
@@ -112,7 +114,7 @@ const AddEventPage = () => {
       title: data.title,
       start: start, 
       end: end,
-      locationName: data.locationName,
+      locationAddress: data.locationAddress,
       description: data.description
     }
   }
@@ -137,12 +139,31 @@ const AddEventPage = () => {
     } 
   }
   const handleEventSubmit = e => {
-    alert("Event Submit")
-    console.log("Event Submit", eventData)
+    axios.post("/.netlify/functions/create-event", {
+      ...eventData,
+      approved: false,
+    })
+      .then(result => {
+        if (result.status !== 200) {
+          console.error("Error creating event")
+          console.error(result)
+          setSubmitError({
+            message: result
+          })
+          return
+        }
+        console.log("Event Created Successfully", result)
+        //resetFileUpload()
+      })
   }
   return (
     <>
       <h1>Add an Event</h1>
+
+      {submitError ? 
+        <>
+          <p>Error: {submitError.message}</p>
+        </>: null}
 
       {step === 1 ? 
         <>

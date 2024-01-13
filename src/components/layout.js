@@ -76,6 +76,7 @@ const Footer = () => (
 const Layout = ({children}) => {
   return (
     <>
+    <script src="/clip.js"/>
       <section id="banner" className="full-width">
         <div id="banner-text-container">
           <div id="banner-title" className="accent-font">Live Jazz Dayton</div>

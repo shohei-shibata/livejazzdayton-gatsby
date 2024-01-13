@@ -1,19 +1,26 @@
 .event-edit-form label {
   margin: 10px 0;
 }
+.date-time-form {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+}
+.date-time-form select:hover {
+  cursor: pointer;
+  background-color: var(--color-background);
+}
 .date-time-form-date,
 .date-time-form-time {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
+  align-items: baseline;
   max-width: 500px;
-  margin: auto;
 }
 .date-time-form-date select,
 .date-time-form-date input,
 .date-time-form-time select,
-.date-time-form-time input,
-.duration input,
-.duration select {
+.date-time-form-time input 
+{
   border: none;
   background-color: #fff;
   text-align: center;
@@ -23,14 +30,18 @@
 }
 
 .date-time-form-date input,
-.date-time-form-time input,
-.duration input {
+.date-time-form-time input
+{
   -moz-appearance: textfield;
 }
-.duration {
-  display: grid;
-  grid-template-columns: 50px 20px 50px;
-  max-width: 120px;
-  align-items: center;
-  margin: auto;
+
+.error {
+  border: solid 1px var(--color-warning);
+  border-radius: 3px;
+  color: var(--color-warning);
+  padding: 1em;
+  background-color: var(--color-warning-bg);
+}
+.error-messages-list {
+  padding-left: 0px;
 }
