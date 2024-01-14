@@ -31,7 +31,6 @@ const getDateString = (value = new Date()) => {
 }
 
 const getCalendarLinks = (title, start, end, address, description, streamLink) => {
-  console.log("CALENDAR", title, start, end)
   const event = {
     title: title,
     start: start,
