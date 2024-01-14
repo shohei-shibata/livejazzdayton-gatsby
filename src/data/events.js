@@ -2,7 +2,7 @@ const {
 		getAllCards,
 		parseEventCard,
 		getImageUrl
-	} = require("./trello.js");
+	} = require("../utils/trello.js");
 const Image = require("@11ty/eleventy-img");
 const slugify = require('slugify');
 const { htmlToText } = require('html-to-text');
@@ -50,7 +50,7 @@ const getIsToday = (value) => {
   return (new Date(value) - new Date())/36e+5 < 21;
 }
 
-async function getTrelloEvents() {
+async function getEvents() {
 		const cards = await getAllCards(listIdApprovedCards);
     cards.sort((a, b) => {
       return new Date(a.due).getTime() - new Date(b.due).getTime();
@@ -118,6 +118,7 @@ async function getTrelloEvents() {
       const { googleCalendar, ics } = getCalendarLinks(name, start, end, locationAddress, htmlToText(description), links.stream);
 
       const eventFormatted = {
+          id: slug,
           slug: slug,
           dateUpdated: dateUpdated,
           title: name,
@@ -152,5 +153,5 @@ async function getTrelloEvents() {
 }
 
 module.exports = { 
-  getTrelloEvents
+  getEvents
 }

@@ -2,24 +2,27 @@ require("dotenv").config({
   path: `.env.${process.env.NODE_ENV}`,
 })
 
-const { getTrelloEvents } = require('./src/utils/events')
+const { getAnnouncements } = require("./src/data/announcements");
+const { getEvents } = require('./src/data/events')
 
+/*
 const fauna = require('fauna');
 
 const client = new fauna.Client({secret: process.env.FAUNA_SECRET_KEY})
 const fql = fauna.fql;
 const FaunaError = fauna.FaunaError;
+*/
 
-function createEventNode(event, createNode, createContentDigest) {
-  console.log("Creating Node for: ", event)
+function createCustomNode(type, data, createNode, createContentDigest) {
+  console.log("Creating ", type, data.slug, data.id)
   createNode({
-    ...event,
-    id: event.slug,
+    ...data,
+    id: data.id,
     parent: null,
     children: [],
     internal: {
-      type: `Event`,
-      contentDigest: createContentDigest(event),
+      type: type,
+      contentDigest: createContentDigest(data),
     },
   })
 }
@@ -29,9 +32,14 @@ exports.sourceNodes = async ({
   createContentDigest,
 }) => {
   // fetch Trello data for events
-  const events = await getTrelloEvents()
+  const events = await getEvents()
   events.map(event => 
-    createEventNode(event, createNode, createContentDigest)
+    createCustomNode("Event", event, createNode, createContentDigest)
+  )
+
+  const announcements = await getAnnouncements()
+  announcements.map(announcement => 
+    createCustomNode("Announcement", announcement, createNode, createContentDigest)
   )
 
   // get data from GitHub API at build time
